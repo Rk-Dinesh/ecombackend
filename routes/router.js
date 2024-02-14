@@ -1,12 +1,30 @@
 const router = require('express').Router();
 const { route } = require('../app');
+const multer = require('multer');
+const path = require('path');
+
 const idcodeController = require('../controller/idcode_controller');
-const parentController = require('../controller/parent_controller');
-const studentController = require('../controller/student_controller');
-const teacherController = require('../controller/teacher_controller');
 const categoriesController = require('../controller/categories_controller');
-const feadbackController = require('../controller/feadback_controller');
 const AdminController = require('../controller/admin_controller');
+const ProductController = require('../controller/product_controller');
+const taxController = require('../controller/tax_controller')
+
+
+
+const storage = multer.diskStorage({
+    destination: './image',
+    filename: (req, file, cb) => {
+        cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+    },
+});
+
+
+const upload1 = multer({storage: storage}).single('categoryimage');
+const product = multer({storage: storage}).single('productimage');
+
+
+router.post('/tax', taxController.create);
+router.get('/taxall',taxController.getall)
 
 router.post('/idcode',idcodeController.idcode);
 
@@ -18,34 +36,20 @@ router.get('/getemail',AdminController.getEmail);
 router.put('/updateadmin', AdminController.Update);
 router.delete('/deleteadmin',AdminController.delete);
 
-router.post('/parentregister',parentController.register);
-router.post('/parentLogin',parentController.parentLogin);
-router.put('/parentUpdate',parentController.parentUpdate);
-router.get('/parentGetData',parentController.parentGet);
-router.get('/parentget',parentController.get);
-router.delete('/parentDelete',parentController.parentDelete);
 
 
-router.post('/studentregister',studentController.studentRegister);
-router.post('/studentLogin',studentController.studentLogin);
-router.put('/studentUpdate',studentController.studentsUpdate);
-router.get('/studentGetData',studentController.studentGet);
-router.get('/studentget',studentController.get);
-router.delete('/studentDelete',studentController.studentDelete);
-
-
-router.post('/teacherregister',teacherController.teacherregister);
-router.post('/teacherlogin',teacherController.teacherLogin);
-router.put('/teacherUpdate',teacherController.teacherUpdate);
-router.get('/teacherGetData',teacherController.teacherGet);
-router.get('/teacherget', teacherController.get);
-router.delete('/teacherDelete',teacherController.teacherDelete);
-
-router.post('/categories',categoriesController.categories);
+router.post('/categories',upload1,categoriesController.categories);
+router.post('/updatecategories',upload1,categoriesController.update);
 router.get('/categoriesGet',categoriesController.get);
+router.get('/getcategories',categoriesController.getCategory);
 router.delete('/categoriesDelete',categoriesController.delete);
 
-router.post('/feadback',feadbackController.feadback);
+
+router.post('/product',product,ProductController.plan);
+router.get('/getproducts',ProductController.getplan);
+router.delete('/deleteproducts',ProductController.delete);
+
+
 
 
 module.exports = router;

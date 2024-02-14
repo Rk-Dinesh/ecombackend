@@ -3,10 +3,10 @@ const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res, next) => {
     try {
-        const { userid, fname, lname, email, phone, role, password } = req.body;
+        const { userid, fname,  email, phone,  password } = req.body;
 
-        const Res = await AdminServices.registerAdmin(fname, lname, email, phone, role, password);
-        let userData = { userid, fname: fname, lname: lname, email: email, phone: phone,role :role,password:password };
+        const Res = await AdminServices.registerAdmin(fname,  email, phone, password);
+        let userData = { userid, fname: fname,  email: email, phone: phone,password:password };
         res.status(200).json(userData)
 
     } catch (error) {
@@ -20,27 +20,27 @@ exports.login = async (req, res, next) => {
         const Admin = await AdminServices.loginAdmin(email, password);
 
         if (!Admin) {
-            res.status(401).json({ message: 'Admin not found' })
+           return res.status(401).json({ message: 'Admin not found' })
         }
         const isMatchAdmin = await Admin.comparePasswords(password);
 
         if (!isMatchAdmin) {
-            res.status(401).json({ message: 'Invalid Password' })
+           return res.status(401).json({ message: 'Invalid Password' })
         }
 
-        const token = jwt.sign({ email: email, role: 'Admin' }, 'Hackwit', { expiresIn: '1h' });
+        const token = jwt.sign({ email: email}, 'Hackwit', { expiresIn: '1h' });
 
-        res.status(200).json({ token });
+       return res.status(200).json({ token });
 
     } catch (error) {
-        throw error
+        next (error)
     }
 }
 
 exports.Update = async (req,res, next) => {
     try {
-        const { userid, fname, lname, email, phone, role} = req.body;
-        const updateData = await AdminServices.updateAdmin(userid, fname, lname, email, phone,role);
+        const { userid, fname, email, phone} = req.body;
+        const updateData = await AdminServices.updateAdmin(userid, fname,  email, phone);
         res.status(200).json(updateData)
     } catch (error) {
         next (error);

@@ -2,10 +2,10 @@ const AdminModel =require('../model/admin_model');
 const IdcodeServices = require("./idcode_service");
 
 class AdminServices{
-    static async registerAdmin(fname,lname,email,phone,role,password){
+    static async registerAdmin(fname,email,phone,password){
         try{
             var userid = await IdcodeServices.generateCode("Admin");
-            const createUser = new AdminModel({userid,fname,lname,email,phone,role,password});
+            const createUser = new AdminModel({userid,fname,email,phone,password});
             return await createUser.save();
         }catch(err){
             throw err;
@@ -20,10 +20,10 @@ class AdminServices{
         }
     }
 
-    static async updateAdmin(userid,fname,lname,email,phone,role){
+    static async updateAdmin(userid,fname,email,phone){
         try {
             var query = {userid : userid};
-            var values = {$set : {fname:fname, lname: lname, email: email, phone: phone, role : role}};
+            var values = {$set : {fname:fname, lname: lname, email: email, phone: phone}};
             
             return await AdminModel.updateOne(query,values)
             
